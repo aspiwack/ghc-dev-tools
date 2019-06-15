@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -o errexit -o pipefail -o noclobber -o nounset
+
+ghc_root=$(git rev-parse --show-toplevel)
+flags='-j6 -c --flavour=devel2'
+
+# I don't know much about argument parsing in bash, so I'm just taking
+# this from https://stackoverflow.com/a/29754866
+OPTIONS=r
+LONGOPTS=rebuild1
+
+# TODOs:
+# - option to override -j
+# - option to override -c
+# - arguments after -- are passed directly to Hadrian, probably
+
+! PARSED=$(getopt --options=$OPTIONS --longoptions=$LONGOPTS --name "$0" -- "$@")
+if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
+    # e.g. return value is 1
+    #  then getopt has complained about wrong arguments to stdout
+    exit 2
+fi
+# read getopt’s output this way to handle the quoting right:
+eval set -- "$PARSED"
+
+# CLI flags
+rebuild1=0
+
+while true; do
+    case "$1" in
+        -r|--rebuild1)
+            rebuild1=1
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Programming error"
+            exit 3
+            ;;
+    esac
+done
+
+if [[ $rebuild1 -eq 0 ]]; then
+    # We didn't explicitly ask to rebuild stage1, so we freeze it!
+    flags="${flags} --freeze1"
+fi
+
+cd $ghc_root
+echo $flags
+hadrian/build.sh $flags
