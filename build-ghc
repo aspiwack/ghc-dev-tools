@@ -7,7 +7,7 @@ flags='-j6 -c --flavour=devel2'
 # I don't know much about argument parsing in bash, so I'm just taking
 # this from https://stackoverflow.com/a/29754866
 OPTIONS=r
-LONGOPTS=rebuild1
+LONGOPTS=rebuild1,test
 
 # TODOs:
 # - option to override -j
@@ -25,11 +25,16 @@ eval set -- "$PARSED"
 
 # CLI flags
 rebuild1=0
+test=0
 
 while true; do
     case "$1" in
         -r|--rebuild1)
             rebuild1=1
+            shift
+            ;;
+        --test)
+            test=1
             shift
             ;;
         --)
@@ -46,6 +51,11 @@ done
 if [[ $rebuild1 -eq 0 ]]; then
     # We didn't explicitly ask to rebuild stage1, so we freeze it!
     flags="${flags} --freeze1"
+fi
+
+if [[ $test -eq 1 ]]; then
+    # We didn't explicitly ask to rebuild stage1, so we freeze it!
+    flags="${flags} test"
 fi
 
 cd $ghc_root
