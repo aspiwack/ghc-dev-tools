@@ -2,7 +2,7 @@
 set -o errexit -o pipefail -o noclobber -o nounset
 
 ghc_root=$(git rev-parse --show-toplevel)
-flags='-j6 -c --flavour=devel2'
+flags='-j20 -c --flavour=devel2'
 
 # I don't know much about argument parsing in bash, so I'm just taking
 # this from https://stackoverflow.com/a/29754866
