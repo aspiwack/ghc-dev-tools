@@ -60,4 +60,4 @@ fi
 
 cd $ghc_root
 echo $flags
-hadrian/build.sh $flags
+hadrian/build $flags
